@@ -9,6 +9,13 @@ allprojects {
         maven {
             // FFmpegKit GitHub Packages (public artifacts)
             url = uri("https://maven.pkg.github.com/tanersener/ffmpeg-kit")
+            // GitHub Packages often requires authentication. Gradle will read credentials
+            // from project properties (set in android/gradle.properties) or environment
+            // variables `GITHUB_ACTOR` and `GITHUB_TOKEN`.
+            credentials {
+                username = (providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR")) as String?
+                password = (providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")) as String?
+            }
         }
     }
 }
