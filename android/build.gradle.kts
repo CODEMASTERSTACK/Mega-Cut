@@ -2,6 +2,14 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            // JitPack - some native artifacts are published here
+            url = uri("https://jitpack.io")
+        }
+        maven {
+            // FFmpegKit GitHub Packages (public artifacts)
+            url = uri("https://maven.pkg.github.com/tanersener/ffmpeg-kit")
+        }
     }
 }
 
