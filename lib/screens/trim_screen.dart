@@ -7,7 +7,7 @@ import 'package:video_player/video_player.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:just_audio/just_audio.dart';
-import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -30,7 +30,6 @@ class _TrimScreenState extends State<TrimScreen> {
 
   final PlayerController _waveController = PlayerController();
   double _zoom = 1.0;
-  final FlutterFFmpeg _ffmpeg = FlutterFFmpeg();
 
   @override
   void dispose() {
@@ -129,15 +128,17 @@ class _TrimScreenState extends State<TrimScreen> {
         ? "-y -i '$_filePath' -ss $startSec -t $durationSec -c copy '$outPath'"
         : "-y -i '$_filePath' -ss $startSec -t $durationSec -acodec copy '$outPath'";
 
-    final rc = await _ffmpeg.execute(cmd);
-    if (rc == 0) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Trim completed: $outPath')));
-      await _offerSave(outPath);
-    } else {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Trim failed')));
-    }
+    await FFmpegKit.executeAsync(cmd, (session) async {
+      final returnCode = await session.getReturnCode();
+      if (returnCode != null && returnCode.isValueSuccess()) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Trim completed: $outPath')));
+        await _offerSave(outPath);
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Trim failed')));
+      }
+    });
   }
 
   Future<void> _offerSave(String srcPath) async {

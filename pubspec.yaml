@@ -11,7 +11,7 @@ dependencies:
     sdk: flutter
   file_picker: any
   permission_handler: any
-  flutter_ffmpeg: ^0.4.2
+  ffmpeg_kit_flutter: any
   video_player: any
   audio_waveforms: any
   just_audio: any
